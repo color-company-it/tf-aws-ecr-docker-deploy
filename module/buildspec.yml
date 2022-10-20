@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging tino Amazon ECR
+      - aws ecr get-login-password --region ${region_name} | docker login --username AWS --password-stdin ${account_id}.dkr.${region_name}.amazonaws.com
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building Docker Image
+      - docker build -t ${docker_tag}:latest .
+      - docker tag ${docker_tag} ${account_id}.dkr.ecr.${region_name}.com/${docker_tag}
+  post_build:
+    commands:
+      - echo Build complete on `date`
+      - echo Pushing Docker Image
+      - docker push ${account_id}.dkr.ecr.${region_name}.amazonaws.com/${docker_tag}:latest
